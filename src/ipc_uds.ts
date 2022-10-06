@@ -1,6 +1,4 @@
-import {type JsonValue} from "https://deno.land/std@0.158.0/encoding/json/stream.ts";
-import {readAll, writeAll} from "https://deno.land/std@0.158.0/streams/mod.ts";
-import {type VarnumOptions, readVarnum, writeVarnum} from "https://deno.land/std@0.158.0/encoding/binary.ts";
+import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
 
 // ==============================
 // = Type Definition

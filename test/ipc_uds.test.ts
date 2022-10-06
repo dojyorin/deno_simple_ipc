@@ -1,4 +1,4 @@
-import {assertEquals} from "https://deno.land/std@0.158.0/testing/asserts.ts";
+import {assertEquals} from "../deps.test.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
 const ch = "test-ch";
