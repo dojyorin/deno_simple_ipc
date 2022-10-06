@@ -1,8 +1,8 @@
 import {assertEquals} from "https://deno.land/std@0.158.0/testing/asserts.ts";
-import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc-uds.ts";
+import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
 Deno.test({
-    name: "Listen socket.",
+    name: "Listen and send using unix socket.",
     async fn(){
         const ch = "test-ch";
 
