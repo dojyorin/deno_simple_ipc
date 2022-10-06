@@ -1,11 +1,11 @@
 import {assertEquals} from "https://deno.land/std@0.158.0/testing/asserts.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
+const ch = "test-ch";
+
 Deno.test({
     name: "Listen and send using unix socket.",
     async fn(){
-        const ch = "test-ch";
-
         const ipc = ipcListen(ch, (data:string)=>{
             assertEquals(data, "request");
 
