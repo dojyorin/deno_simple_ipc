@@ -1,20 +1,36 @@
 import {assertEquals} from "../deps.test.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
-const ch = "test_ch";
+const ch1 = "test_ch1";
+const ch2 = "test_ch2";
 
 Deno.test({
-    name: "Listen and send using unix socket.",
+    name: "Listen and Broadcast.",
     async fn(){
-        const ipc = ipcListen(ch, (data:string)=>{
+        const handle = new Promise((done)=>{
+            const ipc = ipcListen(ch1, (data:string)=>{
+                assertEquals(data, "request");
+                ipc.close();
+
+                done();
+            });
+        });
+
+        await ipcBroadcast(ch1, "request");
+        await handle;
+    }
+});
+
+Deno.test({
+    name: "Listen and Request.",
+    async fn(){
+        const ipc = ipcListen(ch2, (data:string)=>{
             assertEquals(data, "request");
 
             return "response";
         });
 
-        // await ipcBroadcast(ch, "request");
-        const response = await ipcRequest<string, string>(ch, "request");
-
+        const response = await ipcRequest<string, string>(ch2, "request");
         assertEquals(response, "response");
 
         ipc.close();
