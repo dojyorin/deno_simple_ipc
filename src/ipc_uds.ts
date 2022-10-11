@@ -20,7 +20,7 @@ interface UnixListenOptions extends Deno.UnixListenOptions{
 // ==============================
 // = Runnable Code
 // ==============================
-const tempEnv = Deno.env.get("TEMP") ?? "";
+const tmp = Deno.env.get("TMPDIR") ?? Deno.env.get("TMP") ?? Deno.env.get("TEMP") ?? ".";
 
 const vnU8:VarnumOptions = {
     dataType: "uint8"
@@ -42,7 +42,7 @@ function unixOpt(ch:string){
 
     return <UnixListenOptions>{
         transport: "unix",
-        path: `${tempEnv}/.ipc.${ch}`
+        path: `${tmp}/.ipc.${ch}`
     };
 }
 
