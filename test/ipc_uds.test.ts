@@ -8,15 +8,15 @@ Deno.test({
     async fn(){
         const ipc = ipcListen(ch, (data:string)=>{
             assertEquals(data, "request");
-            ipc.close();
-            // return "response";
+
+            return "response";
         });
 
         await ipcBroadcast(ch, "request");
-        // const response = await ipcRequest<string, string>(ch, "request");
+        const response = await ipcRequest<string, string>(ch, "request");
 
-        // assertEquals(response, "response");
+        assertEquals(response, "response");
 
-        // ipc.close();
+        ipc.close();
     }
 });
