@@ -1,7 +1,7 @@
 import {assertEquals} from "../deps.test.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
-const ch = "test-ch";
+const ch = "test_ch";
 
 Deno.test({
     name: "Listen and send using unix socket.",

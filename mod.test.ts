@@ -1,1 +1,1 @@
-export * from "./test/ipc_uds.test.ts";
+import "./test/ipc_uds.test.ts";
