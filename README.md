@@ -1,2 +1,2 @@
 # UnixSocket IPC for Deno
-![](https://github.com/dojyorin/deno_bit_utility/actions/workflows/test.yaml/badge.svg)
+![](https://github.com/dojyorin/deno_ipc_uds/actions/workflows/test.yaml/badge.svg)
