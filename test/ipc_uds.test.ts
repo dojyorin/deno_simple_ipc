@@ -17,13 +17,7 @@ Deno.test({
 
         await ipcBroadcast(ch1, "request");
 
-        const tc = setInterval(()=>{
-            if(!done){
-                return;
-            }
-
-            clearInterval(tc);
-        }, 10);
+        while(!done);
 
         ipc.close();
     }
