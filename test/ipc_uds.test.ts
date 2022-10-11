@@ -7,19 +7,12 @@ const ch2 = "test_ch2";
 Deno.test({
     name: "Listen and Broadcast.",
     async fn(){
-        let done = false;
-
         const ipc = ipcListen(ch1, (data:string)=>{
             assertEquals(data, "request");
-
-            done = true;
+            ipc.close();
         });
 
         await ipcBroadcast(ch1, "request");
-
-        while(!done);
-
-        ipc.close();
     }
 });
 

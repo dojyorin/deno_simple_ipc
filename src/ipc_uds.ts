@@ -26,15 +26,6 @@ const vnU8:VarnumOptions = {
     dataType: "uint8"
 };
 
-// Please implement the windows version soon!!
-// I want to delete this item someday...
-// Reference: https://github.com/tokio-rs/mio/pull/1610
-function osValid(){
-    if(Deno.build.os === "windows"){
-        throw new Error("This feature only availables POSIX compatible system.");
-    }
-}
-
 function unixOpt(ch:string){
     if(/\W/.test(ch)){
         throw new Error();
@@ -61,6 +52,13 @@ async function ipcRx<T extends IpcBody>(con:Deno.Conn){
     return <T>(isbuf ? byte : JSON.parse(new TextDecoder().decode(byte)));
 }
 
+// Please implement the windows version soon!!
+// I want to delete this item someday...
+// Reference: https://github.com/tokio-rs/mio/pull/1610
+if(Deno.build.os === "windows"){
+    throw new Error("This feature only availables POSIX compatible system.");
+}
+
 /**
 * The path to the socket file will be `(tempdir)/.ipc.(ch)`.
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
@@ -69,8 +67,6 @@ async function ipcRx<T extends IpcBody>(con:Deno.Conn){
 * If void it will not send a response.
 **/
 export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onRequest:(data:T)=>U|void|Promise<U|void>){
-    osValid();
-
     const server = Deno.listen(unixOpt(ch));
 
     (async()=>{
@@ -104,8 +100,6 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
 * @param data Send to remote server.
 **/
 export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string, data:T){
-    osValid();
-
     const con = await Deno.connect(unixOpt(ch));
 
     const handler = ipcRx<U>(con);
@@ -122,8 +116,6 @@ export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string
 * @param data Send to remote server.
 **/
 export async function ipcBroadcast<T extends IpcBody>(ch:string, data:T){
-    osValid();
-
     const con = await Deno.connect(unixOpt(ch));
 
     await ipcTx(con, data);
