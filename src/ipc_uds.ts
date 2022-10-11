@@ -20,7 +20,7 @@ interface UnixListenOptions extends Deno.UnixListenOptions{
 // ==============================
 // = Runnable Code
 // ==============================
-const tmp = Deno.env.get("TMPDIR") ?? Deno.env.get("TMP") ?? ".";
+const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
 const vnU8:VarnumOptions = {
     dataType: "uint8"
