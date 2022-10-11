@@ -7,7 +7,7 @@ const ch2 = "test_ch2";
 Deno.test({
     name: "Listen and Broadcast.",
     async fn(){
-        const handle = new Promise((done)=>{
+        const handle = new Promise<void>((done)=>{
             const ipc = ipcListen(ch1, (data:string)=>{
                 assertEquals(data, "request");
                 ipc.close();
