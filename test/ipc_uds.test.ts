@@ -12,7 +12,7 @@ Deno.test({
             return "response";
         });
 
-        await ipcBroadcast(ch, "request");
+        // await ipcBroadcast(ch, "request");
         const response = await ipcRequest<string, string>(ch, "request");
 
         assertEquals(response, "response");
