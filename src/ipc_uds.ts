@@ -19,9 +19,12 @@ export interface IpcListener{
 // Please implement the windows version soon!!
 // I want to delete this item someday...
 // Reference: https://github.com/tokio-rs/mio/pull/1610
-if(Deno.build.os === "windows"){
-    throw new Error("This feature only availables POSIX compatible system.");
+function isWin(){
+    if(Deno.build.os === "windows"){
+        throw new Error("This feature only availables POSIX compatible system.");
+    }
 }
+isWin();
 
 const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
