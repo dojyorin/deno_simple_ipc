@@ -1,4 +1,4 @@
-import {assertEquals} from "../deps.test.ts";
+import {assertEquals, delay} from "../deps.test.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
 const ch1 = "test_ch1";
@@ -13,6 +13,10 @@ Deno.test({
         });
 
         await ipcBroadcast(ch1, "request");
+
+        while(Deno.resources()[ipc.rid] === "unixListener"){
+            await delay(100);
+        }
     }
 });
 

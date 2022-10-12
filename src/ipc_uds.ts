@@ -76,6 +76,8 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
                 if(result){
                     await ipcTx(con, result);
                 }
+
+                con.close();
             })();
         }
     })();
