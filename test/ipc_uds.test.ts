@@ -1,23 +1,27 @@
-import {assertEquals} from "../deps.test.ts";
+import {assertEquals, delay} from "../deps.test.ts";
 import {ipcListen, ipcRequest, ipcBroadcast} from "../src/ipc_uds.ts";
 
 const ch1 = "test_ch1";
 const ch2 = "test_ch2";
 
+function isAlive(rid:number){
+    return Deno.resources()[rid] === "unixListener";
+}
+
 Deno.test({
     name: "Listen and Broadcast.",
     async fn(){
-        const handle = new Promise<void>((done)=>{
-            const ipc = ipcListen(ch1, (data:string)=>{
-                assertEquals(data, "request");
-                ipc.close();
+        const ipc = ipcListen(ch1, (data:string)=>{
+            assertEquals(data, "request");
 
-                done();
-            });
+            ipc.close();
         });
 
         await ipcBroadcast(ch1, "request");
-        await handle;
+
+        while(isAlive(ipc.rid)){
+            await delay(100);
+        }
     }
 });
 

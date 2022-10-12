@@ -11,39 +11,33 @@ export interface IpcListener{
     close(): void;
 }
 
-// The original built-in type has a bug that UnixSocket properties are not defined in the Unstable version,
-// so the extended type is temporarily applied.
-interface UnixListenOptions extends Deno.UnixListenOptions{
-    transport: "unix";
-}
-
 // ==============================
 // = Runnable Code
 // ==============================
-const tmp = Deno.env.get("TMPDIR") ?? Deno.env.get("TMP") ?? ".";
+
+// << No Windows Support >>
+// Please implement the windows version soon!!
+// I want to delete this item someday...
+// Reference: https://github.com/tokio-rs/mio/pull/1610
+function isWin(){
+    if(Deno.build.os === "windows"){
+        throw new Error("This feature only availables POSIX compatible system.");
+    }
+}
+isWin();
+
+const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
 const vnU8:VarnumOptions = {
     dataType: "uint8"
 };
 
-// Please implement the windows version soon!!
-// I want to delete this item someday...
-// Reference: https://github.com/tokio-rs/mio/pull/1610
-function osValid(){
-    if(Deno.build.os === "windows"){
-        throw new Error("This feature only availables POSIX compatible system.");
-    }
-}
-
-function unixOpt(ch:string){
+function ipcPath(ch:string){
     if(/\W/.test(ch)){
         throw new Error();
     }
 
-    return <UnixListenOptions>{
-        transport: "unix",
-        path: `${tmp}/.ipc.${ch}`
-    };
+    return `${tmp}/.ipc.${ch}`;
 }
 
 async function ipcTx<T extends IpcBody>(con:Deno.Conn, data:T){
@@ -52,6 +46,7 @@ async function ipcTx<T extends IpcBody>(con:Deno.Conn, data:T){
 
     await writeVarnum(con, isbuf ? 1 : 0, vnU8);
     await writeAll(con, byte);
+    await con.closeWrite();
 }
 
 async function ipcRx<T extends IpcBody>(con:Deno.Conn){
@@ -69,9 +64,10 @@ async function ipcRx<T extends IpcBody>(con:Deno.Conn){
 * If void it will not send a response.
 **/
 export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onRequest:(data:T)=>U|void|Promise<U|void>){
-    osValid();
-
-    const server = Deno.listen(unixOpt(ch));
+    const server = Deno.listen({
+        transport: "unix",
+        path: ipcPath(ch)
+    });
 
     (async()=>{
         for await(const con of server){
@@ -81,6 +77,8 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
                 if(result){
                     await ipcTx(con, result);
                 }
+
+                con.close();
             })();
         }
     })();
@@ -104,9 +102,10 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
 * @param data Send to remote server.
 **/
 export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string, data:T){
-    osValid();
-
-    const con = await Deno.connect(unixOpt(ch));
+    const con = await Deno.connect({
+        transport: "unix",
+        path: ipcPath(ch)
+    });
 
     const handler = ipcRx<U>(con);
     await ipcTx(con, data);
@@ -122,9 +121,10 @@ export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string
 * @param data Send to remote server.
 **/
 export async function ipcBroadcast<T extends IpcBody>(ch:string, data:T){
-    osValid();
-
-    const con = await Deno.connect(unixOpt(ch));
+    const con = await Deno.connect({
+        transport: "unix",
+        path: ipcPath(ch)
+    });
 
     await ipcTx(con, data);
     con.close();
