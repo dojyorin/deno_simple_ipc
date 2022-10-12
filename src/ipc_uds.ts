@@ -46,7 +46,7 @@ async function ipcTx<T extends IpcBody>(con:Deno.Conn, data:T){
 
     await writeVarnum(con, isbuf ? 1 : 0, vnU8);
     await writeAll(con, byte);
-    await con.writeClose();
+    await con.closeWrite();
 }
 
 async function ipcRx<T extends IpcBody>(con:Deno.Conn){
