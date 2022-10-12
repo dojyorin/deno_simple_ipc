@@ -13,6 +13,7 @@ Deno.test({
     async fn(){
         const ipc = ipcListen(ch1, (data:string)=>{
             assertEquals(data, "request");
+
             ipc.close();
         });
 
@@ -36,8 +37,6 @@ Deno.test({
         const response = await ipcRequest<string, string>(ch2, "request");
         assertEquals(response, "response");
 
-        while(isAlive(ipc.rid)){
-            await delay(100);
-        }
+        ipc.close();
     }
 });
