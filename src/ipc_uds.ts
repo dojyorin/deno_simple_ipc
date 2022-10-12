@@ -118,7 +118,10 @@ export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string
 * @param data Send to remote server.
 **/
 export async function ipcBroadcast<T extends IpcBody>(ch:string, data:T){
-    const con = await Deno.connect(unixOpt(ch));
+    const con = await Deno.connect({
+        transport: "unix",
+        path: ipcPath(ch)
+    });
 
     await ipcTx(con, data);
     con.close();
