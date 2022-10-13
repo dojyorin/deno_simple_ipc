@@ -1,13 +1,12 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
 
-const osWin = Deno.build.os === "windows";
-const tmpDir = osWin ? "C:/Windows/Temp": "/tmp";
+const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
 // << No Windows Support >>
 // This part will be removed if deno supports unix socket on windows.
 // Reference: https://github.com/tokio-rs/mio/pull/1610
 function excludeWindows(){
-    if(osWin){
+    if(Deno.build.os === "windows"){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }
@@ -17,7 +16,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    return `${tmpDir}/.socket.${ch}`;
+    return `${tmpDirectory}/.socket.${ch}`;
 }
 
 function openServer(ch:string){
