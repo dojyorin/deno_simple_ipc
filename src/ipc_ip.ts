@@ -1,46 +1,37 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
 
-const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
-
-// << No Windows Support >>
-// This part will be removed if deno supports unix socket on windows.
-// Reference: https://github.com/tokio-rs/mio/pull/1610
-function excludeWindows(){
-    if(Deno.build.os === "windows"){
-        throw new Error("This feature only availables POSIX compatible system.");
-    }
-}
-
-function socketPath(ch:string){
-    if(/\W/.test(ch)){
+function ephemeralPort(ch:number){
+    if(ch < 0 || 16383 < ch){
         throw new Error();
     }
 
-    return `${tmpDirectory}/.socket.${ch}`;
+    return 49152 + ch;
 }
 
-function openServer(ch:string){
-    excludeWindows();
-
+function openServer(ch:number){
     return Deno.listen({
-        transport: "unix",
-        path: socketPath(ch)
+        transport: "tcp",
+        hostname: "127.0.0.1",
+        port: ephemeralPort(ch)
     });
 }
 
-async function openClient(ch:string){
-    excludeWindows();
-
+async function openClient(ch:number){
     return await Deno.connect({
-        transport: "unix",
-        path: socketPath(ch)
+        transport: "tcp",
+        hostname: "127.0.0.1",
+        port: ephemeralPort(ch)
     });
 }
 
 function returnServer(server:Deno.Listener){
     return {
-        get path(){
-            return (<Deno.UnixAddr>server.addr).path;
+        get host(){
+            return (<Deno.NetAddr>server.addr).hostname;
+        },
+
+        get port(){
+            return (<Deno.NetAddr>server.addr).port;
         },
 
         get rid(){
@@ -60,7 +51,7 @@ function returnServer(server:Deno.Listener){
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, onMessage:MessageHandler<T, U>){
+export function listenIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, onMessage:MessageHandler<T, U>){
     const server = openServer(ch);
     handleRequest(server, onMessage);
 
@@ -74,7 +65,7 @@ export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(c
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:MessageHandler<T, void>){
+export function listenIpBroadcast<T extends MessageBody>(ch:number, onMessage:MessageHandler<T, void>){
     const server = openServer(ch);
     handleBroadcast(server, onMessage);
 
@@ -86,7 +77,7 @@ export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:M
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, data:T){
+export async function postIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
 
     return await postRequest<T, U>(client, data);
@@ -97,7 +88,7 @@ export async function postUdsRequest<T extends MessageBody, U extends MessageBod
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postUdsBroadcast<T extends MessageBody>(ch:string, data:T){
+export async function postIpBroadcast<T extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
 
     await postBroadcast(client, data);
