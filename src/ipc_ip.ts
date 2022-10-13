@@ -1,26 +1,26 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
 
-function ephemeralPort(port:number){
-    if(port < 0 || 16383 < port){
+function ephemeralPort(ch:number){
+    if(ch < 0 || 16383 < ch){
         throw new Error();
     }
 
-    return 49152 + port;
+    return 49152 + ch;
 }
 
-function openServer(port:number){
+function openServer(ch:number){
     return Deno.listen({
         transport: "tcp",
         hostname: "127.0.0.1",
-        port: ephemeralPort(port)
+        port: ephemeralPort(ch)
     });
 }
 
-async function openClient(port:number){
+async function openClient(ch:number){
     return await Deno.connect({
         transport: "tcp",
         hostname: "127.0.0.1",
-        port: ephemeralPort(port)
+        port: ephemeralPort(ch)
     });
 }
 
@@ -51,8 +51,8 @@ function returnServer(server:Deno.Listener){
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenIpRequest<T extends MessageBody, U extends MessageBody>(port:number, onMessage:MessageHandler<T, U>){
-    const server = openServer(port);
+export function listenIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, onMessage:MessageHandler<T, U>){
+    const server = openServer(ch);
     handleRequest(server, onMessage);
 
     return returnServer(server);
@@ -65,8 +65,8 @@ export function listenIpRequest<T extends MessageBody, U extends MessageBody>(po
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenIpBroadcast<T extends MessageBody>(port:number, onMessage:MessageHandler<T, void>){
-    const server = openServer(port);
+export function listenIpBroadcast<T extends MessageBody>(ch:number, onMessage:MessageHandler<T, void>){
+    const server = openServer(ch);
     handleBroadcast(server, onMessage);
 
     return returnServer(server);
@@ -77,8 +77,8 @@ export function listenIpBroadcast<T extends MessageBody>(port:number, onMessage:
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postIpRequest<T extends MessageBody, U extends MessageBody>(port:number, data:T){
-    const client = await openClient(port);
+export async function postIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, data:T){
+    const client = await openClient(ch);
 
     return await postRequest<T, U>(client, data);
 }
@@ -88,8 +88,8 @@ export async function postIpRequest<T extends MessageBody, U extends MessageBody
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postIpBroadcast<T extends MessageBody>(port:number, data:T){
-    const client = await openClient(port);
+export async function postIpBroadcast<T extends MessageBody>(ch:number, data:T){
+    const client = await openClient(ch);
 
     await postBroadcast(client, data);
 }
