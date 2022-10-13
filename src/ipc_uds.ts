@@ -1,95 +1,52 @@
-import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
 
-// ==============================
-// = Type Definition
-// ==============================
-export type IpcBody = JsonValue | Uint8Array;
-
-export interface IpcListener{
-    get path(): string;
-    get rid(): number;
-    close(): void;
-}
-
-// ==============================
-// = Runnable Code
-// ==============================
+const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
 // << No Windows Support >>
-// Please implement the windows version soon!!
-// I want to delete this item someday...
+// This part will be removed if deno supports unix socket on windows.
 // Reference: https://github.com/tokio-rs/mio/pull/1610
-function isWin(){
+function excludeWindows(){
     if(Deno.build.os === "windows"){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }
-isWin();
 
-const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
-
-const vnU8:VarnumOptions = {
-    dataType: "uint8"
-};
-
-function ipcPath(ch:string){
+function socketPath(ch:string){
     if(/\W/.test(ch)){
         throw new Error();
     }
 
-    return `${tmp}/.ipc.${ch}`;
+    return `${tmpDirectory}/.socket.${ch}`;
 }
 
-async function ipcTx<T extends IpcBody>(con:Deno.Conn, data:T){
-    const isbuf = data instanceof Uint8Array;
-    const byte = isbuf ? data : new TextEncoder().encode(JSON.stringify(data));
+function openServer(ch:string){
+    excludeWindows();
 
-    await writeVarnum(con, isbuf ? 1 : 0, vnU8);
-    await writeAll(con, byte);
-    await con.closeWrite();
-}
-
-async function ipcRx<T extends IpcBody>(con:Deno.Conn){
-    const isbuf = await readVarnum(con, vnU8);
-    const byte = await readAll(con);
-
-    return <T>(isbuf ? byte : JSON.parse(new TextDecoder().decode(byte)));
-}
-
-/**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onRequest A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
-**/
-export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onRequest:(data:T)=>U|void|Promise<U|void>){
-    const server = Deno.listen({
+    return Deno.listen({
         transport: "unix",
-        path: ipcPath(ch)
+        path: socketPath(ch)
     });
+}
 
-    (async()=>{
-        for await(const con of server){
-            (async()=>{
-                const result = await onRequest(await ipcRx(con));
+async function openClient(ch:string){
+    excludeWindows();
 
-                if(result){
-                    await ipcTx(con, result);
-                }
+    return await Deno.connect({
+        transport: "unix",
+        path: socketPath(ch)
+    });
+}
 
-                con.close();
-            })();
-        }
-    })();
-
-    return <IpcListener>{
+function returnServer(server:Deno.Listener){
+    return {
         get path(){
             return (<Deno.UnixAddr>server.addr).path;
         },
+
         get rid(){
             return server.rid;
         },
+
         close(){
             server.close();
         }
@@ -97,35 +54,48 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param onMessage Handler function that is called each time data is received from the remote client, Return value is the response data.
 **/
-export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string, data:T){
-    const con = await Deno.connect({
-        transport: "unix",
-        path: ipcPath(ch)
-    });
+export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, onMessage:MessageHandler<T, U>){
+    const server = openServer(ch);
+    handleRequest(server, onMessage);
 
-    const handler = ipcRx<U>(con);
-    await ipcTx(con, data);
-    const response = await handler;
-    con.close();
-
-    return response;
+    return returnServer(server);
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param onMessage Handler function that is called each time data is received from the remote client.
 **/
-export async function ipcBroadcast<T extends IpcBody>(ch:string, data:T){
-    const con = await Deno.connect({
-        transport: "unix",
-        path: ipcPath(ch)
-    });
+export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:MessageHandler<T, void>){
+    const server = openServer(ch);
+    handleBroadcast(server, onMessage);
 
-    await ipcTx(con, data);
-    con.close();
+    return returnServer(server);
+}
+
+/**
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param data Data to send to the remote host.
+* @returns Response data from remote host.
+**/
+export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, data:T){
+    const client = await openClient(ch);
+
+    return await postRequest<T, U>(client, data);
+}
+
+/**
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param data Data to send to the remote host.
+**/
+export async function postUdsBroadcast<T extends MessageBody>(ch:string, data:T){
+    const client = await openClient(ch);
+
+    await postBroadcast(client, data);
 }

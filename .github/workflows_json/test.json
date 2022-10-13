@@ -2,10 +2,16 @@
     "name": "Test",
     "on": {
         "push": {
-            "branches": "*"
+            "branches-ignore": [
+                "master",
+                "topic/**"
+            ],
+            "paths-ignore": [
+                "**.md"
+            ]
         },
         "pull_request": {
-            "branches": "*"
+            "branches": "master"
         }
     },
     "jobs": {
@@ -17,7 +23,8 @@
                 "matrix": {
                     "os": [
                         "ubuntu-latest",
-                        "macos-latest"
+                        "macos-latest",
+                        "windows-latest"
                     ]
                 }
             },
