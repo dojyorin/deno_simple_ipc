@@ -23,7 +23,8 @@
                 "matrix": {
                     "os": [
                         "ubuntu-latest",
-                        "macos-latest"
+                        "macos-latest",
+                        "windows-latest"
                     ]
                 }
             },
