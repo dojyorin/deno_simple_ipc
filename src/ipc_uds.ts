@@ -54,11 +54,9 @@ function returnServer(server:Deno.Listener){
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onMessage A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param onMessage Handler function that is called each time data is received from the remote client, Return value is the response data.
 **/
 export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, onMessage:MessageHandler<T, U>){
     const server = openServer(ch);
@@ -68,11 +66,9 @@ export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(c
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onMessage A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param onMessage Handler function that is called each time data is received from the remote client.
 **/
 export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:MessageHandler<T, void>){
     const server = openServer(ch);
@@ -82,9 +78,10 @@ export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:M
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param data Data to send to the remote host.
+* @returns Response data from remote host.
 **/
 export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, data:T){
     const client = await openClient(ch);
@@ -93,9 +90,9 @@ export async function postUdsRequest<T extends MessageBody, U extends MessageBod
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The path to the socket file will be `(tmpdir)/.socket.(ch)`.
+* @param ch Name of the socket file. Valid character patterns are `^\w+$`.
+* @param data Data to send to the remote host.
 **/
 export async function postUdsBroadcast<T extends MessageBody>(ch:string, data:T){
     const client = await openClient(ch);

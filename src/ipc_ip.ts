@@ -45,11 +45,9 @@ function returnServer(server:Deno.Listener){
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onMessage A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
+* The port range it can listen on is `49152` ~ `65535` (ephemeral ports).
+* @param ch Listen port number from `0` ~ `16383`. The actual port number will be the value with `49152` added internally.
+* @param onMessage Handler function that is called each time data is received from the remote client, Return value is the response data.
 **/
 export function listenIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, onMessage:MessageHandler<T, U>){
     const server = openServer(ch);
@@ -59,11 +57,9 @@ export function listenIpRequest<T extends MessageBody, U extends MessageBody>(ch
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onMessage A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
+* The port range it can listen on is `49152` ~ `65535` (ephemeral ports).
+* @param ch Listen port number from `0` ~ `16383`. The actual port number will be the value with `49152` added internally.
+* @param onMessage Handler function that is called each time data is received from the remote client.
 **/
 export function listenIpBroadcast<T extends MessageBody>(ch:number, onMessage:MessageHandler<T, void>){
     const server = openServer(ch);
@@ -73,9 +69,10 @@ export function listenIpBroadcast<T extends MessageBody>(ch:number, onMessage:Me
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The port range it can listen on is `49152` ~ `65535` (ephemeral ports).
+* @param ch Listen port number from `0` ~ `16383`. The actual port number will be the value with `49152` added internally.
+* @param data Data to send to the remote host.
+* @returns Response data from remote host.
 **/
 export async function postIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
@@ -84,9 +81,9 @@ export async function postIpRequest<T extends MessageBody, U extends MessageBody
 }
 
 /**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* The port range it can listen on is `49152` ~ `65535` (ephemeral ports).
+* @param ch Listen port number from `0` ~ `16383`. The actual port number will be the value with `49152` added internally.
+* @param data Data to send to the remote host.
 **/
 export async function postIpBroadcast<T extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
