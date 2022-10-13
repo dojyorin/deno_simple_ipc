@@ -12,7 +12,7 @@ function excludeWindows(){
     }
 }
 
-function generatePath(ch:string){
+function socketPath(ch:string){
     if(/\W/.test(ch)){
         throw new Error();
     }
@@ -25,7 +25,7 @@ function openServer(ch:string){
 
     return Deno.listen({
         transport: "unix",
-        path: generatePath(ch)
+        path: socketPath(ch)
     });
 }
 
@@ -34,7 +34,7 @@ async function openClient(ch:string){
 
     return await Deno.connect({
         transport: "unix",
-        path: generatePath(ch)
+        path: socketPath(ch)
     });
 }
 

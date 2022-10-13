@@ -1,42 +1,43 @@
-import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
-import {type IpcBody, type IpcListener, } from "./util.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
 
-/**
-* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
-* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param onRequest A handler function that is called each time data is received from the remote client,
-* If this function return value, it will send a response to the connection,
-* If void it will not send a response.
-**/
-export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onRequest:(data:T)=>U|void|Promise<U|void>){
-    osValid();
+function ephemeralPort(port:number){
+    if(port < 0 || 16383 < port){
+        throw new Error();
+    }
 
-    const server = Deno.listen({
-        transport: "unix",
-        path: ipcPath(ch)
+    return 49152 + port;
+}
+
+function openServer(port:number){
+    return Deno.listen({
+        transport: "tcp",
+        hostname: "127.0.0.1",
+        port: ephemeralPort(port)
     });
+}
 
-    (async()=>{
-        for await(const con of server){
-            (async()=>{
-                const result = await onRequest(await ipcRx(con));
+async function openClient(port:number){
+    return await Deno.connect({
+        transport: "tcp",
+        hostname: "127.0.0.1",
+        port: ephemeralPort(port)
+    });
+}
 
-                if(result){
-                    await ipcTx(con, result);
-                }
-
-                con.close();
-            })();
-        }
-    })();
-
-    return <IpcListener>{
-        get path(){
-            return (<Deno.UnixAddr>server.addr).path;
+function returnServer(server:Deno.Listener){
+    return {
+        get host(){
+            return (<Deno.NetAddr>server.addr).hostname;
         },
+
+        get port(){
+            return (<Deno.NetAddr>server.addr).port;
+        },
+
         get rid(){
             return server.rid;
         },
+
         close(){
             server.close();
         }
@@ -46,22 +47,29 @@ export function ipcListen<T extends IpcBody, U extends IpcBody>(ch:string, onReq
 /**
 * The path to the socket file will be `(tempdir)/.ipc.(ch)`.
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
-* @param data Send to remote server.
+* @param onMessage A handler function that is called each time data is received from the remote client,
+* If this function return value, it will send a response to the connection,
+* If void it will not send a response.
 **/
-export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string, data:T){
-    osValid();
+export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(port:number, onMessage:MessageHandler<T, U>){
+    const server = openServer(port);
+    handleRequest(server, onMessage);
 
-    const con = await Deno.connect({
-        transport: "unix",
-        path: ipcPath(ch)
-    });
+    return returnServer(server);
+}
 
-    const handler = ipcRx<U>(con);
-    await ipcTx(con, data);
-    const response = await handler;
-    con.close();
+/**
+* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
+* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
+* @param onMessage A handler function that is called each time data is received from the remote client,
+* If this function return value, it will send a response to the connection,
+* If void it will not send a response.
+**/
+export function listenUdsBroadcast<T extends MessageBody>(port:number, onMessage:MessageHandler<T, void>){
+    const server = openServer(port);
+    handleBroadcast(server, onMessage);
 
-    return response;
+    return returnServer(server);
 }
 
 /**
@@ -69,14 +77,19 @@ export async function ipcRequest<T extends IpcBody, U extends IpcBody>(ch:string
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function ipcBroadcast<T extends IpcBody>(ch:string, data:T){
-    osValid();
+export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(port:number, data:T){
+    const client = await openClient(port);
 
-    const con = await Deno.connect({
-        transport: "unix",
-        path: ipcPath(ch)
-    });
+    return await postRequest<T, U>(client, data);
+}
 
-    await ipcTx(con, data);
-    con.close();
+/**
+* The path to the socket file will be `(tempdir)/.ipc.(ch)`.
+* @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
+* @param data Send to remote server.
+**/
+export async function postUdsBroadcast<T extends MessageBody>(port:number, data:T){
+    const client = await openClient(port);
+
+    await postBroadcast(client, data);
 }
