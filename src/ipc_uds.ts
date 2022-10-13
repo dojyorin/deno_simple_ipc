@@ -1,7 +1,7 @@
 import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
 
 // ==============================
-// = Type Definition
+// > Type Definition
 // ==============================
 export type IpcBody = JsonValue | Uint8Array;
 
@@ -12,7 +12,7 @@ export interface IpcListener{
 }
 
 // ==============================
-// = Runnable Code
+// > Runnable Code
 // ==============================
 
 // << No Windows Support >>
