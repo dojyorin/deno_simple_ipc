@@ -51,7 +51,7 @@ function returnServer(server:Deno.Listener){
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(port:number, onMessage:MessageHandler<T, U>){
+export function listenIpRequest<T extends MessageBody, U extends MessageBody>(port:number, onMessage:MessageHandler<T, U>){
     const server = openServer(port);
     handleRequest(server, onMessage);
 
@@ -65,7 +65,7 @@ export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(p
 * If this function return value, it will send a response to the connection,
 * If void it will not send a response.
 **/
-export function listenUdsBroadcast<T extends MessageBody>(port:number, onMessage:MessageHandler<T, void>){
+export function listenIpBroadcast<T extends MessageBody>(port:number, onMessage:MessageHandler<T, void>){
     const server = openServer(port);
     handleBroadcast(server, onMessage);
 
@@ -77,7 +77,7 @@ export function listenUdsBroadcast<T extends MessageBody>(port:number, onMessage
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(port:number, data:T){
+export async function postIpRequest<T extends MessageBody, U extends MessageBody>(port:number, data:T){
     const client = await openClient(port);
 
     return await postRequest<T, U>(client, data);
@@ -88,7 +88,7 @@ export async function postUdsRequest<T extends MessageBody, U extends MessageBod
 * @param ch Socket identifier, Only allowed character is `\w` in regular expressions.
 * @param data Send to remote server.
 **/
-export async function postUdsBroadcast<T extends MessageBody>(port:number, data:T){
+export async function postIpBroadcast<T extends MessageBody>(port:number, data:T){
     const client = await openClient(port);
 
     await postBroadcast(client, data);
