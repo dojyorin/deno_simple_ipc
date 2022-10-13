@@ -1,7 +1,9 @@
 name: Test
 "on":
     push:
-        branches-ignore: master
+        branches-ignore:
+            - master
+            - topic/**
         paths-ignore:
             - '**.md'
     pull_request:
