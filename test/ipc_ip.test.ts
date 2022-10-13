@@ -4,10 +4,6 @@ import {listenIpRequest, listenIpBroadcast, postIpRequest, postIpBroadcast} from
 const ch1 = 0;
 const ch2 = 1;
 
-function isAlive(rid:number){
-    return Deno.resources()[rid] === "unixListener";
-}
-
 Deno.test({
     name: "IP: Listen and Broadcast.",
     async fn(){
@@ -19,7 +15,7 @@ Deno.test({
 
         await postIpBroadcast(ch1, "request");
 
-        while(isAlive(ipc.rid)){
+        while(Deno.resources()[ipc.rid]){
             await delay(100);
         }
     }
