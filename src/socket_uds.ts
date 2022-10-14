@@ -1,4 +1,4 @@
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./socket_common.ts";
 
 const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 

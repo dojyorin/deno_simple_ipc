@@ -1,4 +1,4 @@
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./ipc_common.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./socket_common.ts";
 
 function ephemeralPort(ch:number){
     if(ch < 0 || 16383 < ch){

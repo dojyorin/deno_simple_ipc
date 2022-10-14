@@ -1,5 +1,5 @@
 import {assertEquals, delay} from "../deps.test.ts";
-import {listenUdsRequest, listenUdsBroadcast, postUdsRequest, postUdsBroadcast} from "../src/ipc_uds.ts";
+import {listenUdsRequest, listenUdsBroadcast, postUdsRequest, postUdsBroadcast} from "../src/socket_uds.ts";
 
 const ch1 = "ch0";
 const ch2 = "ch1";
