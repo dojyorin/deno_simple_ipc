@@ -31,7 +31,8 @@ async function socketRx<T extends MessageBody>(con:Deno.Conn){
 export async function handleRequest<T extends MessageBody, U extends MessageBody>(server:Deno.Listener, onMessage:MessageHandler<T, U>){
     for await(const socket of server){
         (async()=>{
-            await socketTx(socket, await onMessage(await socketRx(socket)));
+            const result = await onMessage(await socketRx(socket));
+            await socketTx(socket, result);
             socket.close();
         })();
     }
