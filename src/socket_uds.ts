@@ -16,7 +16,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    return `${tmpDirectory}/.socket.${ch}`;
+    return `${tmpDirectory}/.deno.${ch}.socket`;
 }
 
 function openServer(ch:string){
