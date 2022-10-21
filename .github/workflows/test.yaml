@@ -1,13 +1,18 @@
 name: Test
 "on":
     push:
-        branches-ignore:
-            - master
-            - topic/**
+        branches:
+            - dev
         paths-ignore:
+            - .git*
             - '**.md'
     pull_request:
-        branches: master
+        branches:
+            - master
+            - dev
+        paths-ignore:
+            - .git*
+            - '**.md'
 jobs:
     test:
         name: 'Test: ${{matrix.os}}'

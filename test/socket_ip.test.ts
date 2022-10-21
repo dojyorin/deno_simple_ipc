@@ -1,5 +1,5 @@
 import {assertEquals, delay} from "../deps.test.ts";
-import {listenIpRequest, listenIpBroadcast, postIpRequest, postIpBroadcast} from "../src/ipc_ip.ts";
+import {listenIpRequest, listenIpBroadcast, postIpRequest, postIpBroadcast} from "../src/socket_ip.ts";
 
 const ch1 = 0;
 const ch2 = 1;

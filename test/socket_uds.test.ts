@@ -1,13 +1,11 @@
 import {assertEquals, delay} from "../deps.test.ts";
-import {listenUdsRequest, listenUdsBroadcast, postUdsRequest, postUdsBroadcast} from "../src/ipc_uds.ts";
+import {listenUdsRequest, listenUdsBroadcast, postUdsRequest, postUdsBroadcast} from "../src/socket_uds.ts";
 
 const ch1 = "ch0";
 const ch2 = "ch1";
 
 Deno.test({
-    // << No Windows Support >>
-    // This part will be removed if deno supports unix socket on windows.
-    // Reference: https://github.com/tokio-rs/mio/pull/1610
+    // No Windows Support
     ignore: Deno.build.os === "windows",
     name: "UDS: Listen and Broadcast.",
     async fn(){
@@ -26,9 +24,7 @@ Deno.test({
 });
 
 Deno.test({
-    // << No Windows Support >>
-    // This part will be removed if deno supports unix socket on windows.
-    // Reference: https://github.com/tokio-rs/mio/pull/1610
+    // No Windows Support
     ignore: Deno.build.os === "windows",
     name: "UDS: Listen and Request.",
     async fn(){
