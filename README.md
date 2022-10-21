@@ -1,5 +1,5 @@
 # **Simple IPC for Deno**
-![](https://github.com/dojyorin/deno_ipc_uds/actions/workflows/test.yaml/badge.svg?branch=master)
+![Actions-Test](https://github.com/dojyorin/deno_simple_ipc/actions/workflows/test.yaml/badge.svg?branch=master)
 
 # UnixSocket
 
