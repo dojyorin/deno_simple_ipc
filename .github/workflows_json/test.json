@@ -3,11 +3,11 @@
     "on": {
         "push": {
             "branches": [
-                "!master",
-                "!topic/**"
+                "dev"
             ],
-            "paths": [
-                "!**.md"
+            "paths-ignore": [
+                ".git*",
+                "**.md"
             ]
         },
         "pull_request": {
@@ -15,8 +15,9 @@
                 "master",
                 "dev"
             ],
-            "paths": [
-                "!**.md"
+            "paths-ignore": [
+                ".git*",
+                "**.md"
             ]
         }
     },
