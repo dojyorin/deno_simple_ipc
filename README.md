@@ -1,5 +1,5 @@
 # **Simple IPC for Deno**
-![Actions-Test](https://github.com/dojyorin/deno_simple_ipc/actions/workflows/test.yaml/badge.svg?branch=master)
+![Actions-Test](https://github.com/dojyorin/deno_simple_ipc/actions/workflows/test.yaml/badge.svg)
 ![Actions-Release](https://github.com/dojyorin/deno_simple_ipc/actions/workflows/release.yaml/badge.svg)
 
 The simple and lightweight module that wraps `Deno.listen()` and `Deno.connect()` for basic inter-process communication (IPC) in Deno.
