@@ -1,10 +1,8 @@
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./socket_common.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
 const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
 
-// << No Windows Support >>
-// This part will be removed if deno supports unix socket on windows.
-// Reference: https://github.com/tokio-rs/mio/pull/1610
+// Windows is not support.
 function excludeWindows(){
     if(Deno.build.os === "windows"){
         throw new Error("This feature only availables POSIX compatible system.");
@@ -86,7 +84,7 @@ export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:M
 export async function postUdsRequest<T extends MessageBody, U extends MessageBody>(ch:string, data:T){
     const client = await openClient(ch);
 
-    return await postRequest<T, U>(client, data);
+    return await sendRequest<T, U>(client, data);
 }
 
 /**
@@ -97,5 +95,5 @@ export async function postUdsRequest<T extends MessageBody, U extends MessageBod
 export async function postUdsBroadcast<T extends MessageBody>(ch:string, data:T){
     const client = await openClient(ch);
 
-    await postBroadcast(client, data);
+    await sendBroadcast(client, data);
 }

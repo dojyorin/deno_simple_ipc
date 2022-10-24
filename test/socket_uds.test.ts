@@ -5,7 +5,7 @@ const ch1 = "ch0";
 const ch2 = "ch1";
 
 Deno.test({
-    // No Windows Support
+    // Windows is not support.
     ignore: Deno.build.os === "windows",
     name: "UDS: Listen and Broadcast.",
     async fn(){
@@ -24,7 +24,7 @@ Deno.test({
 });
 
 Deno.test({
-    // No Windows Support
+    // Windows is not support.
     ignore: Deno.build.os === "windows",
     name: "UDS: Listen and Request.",
     async fn(){

@@ -1,4 +1,4 @@
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, postRequest, postBroadcast} from "./socket_common.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
 function ephemeralPort(ch:number){
     if(ch < 0 || 16383 < ch){
@@ -77,7 +77,7 @@ export function listenIpBroadcast<T extends MessageBody>(ch:number, onMessage:Me
 export async function postIpRequest<T extends MessageBody, U extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
 
-    return await postRequest<T, U>(client, data);
+    return await sendRequest<T, U>(client, data);
 }
 
 /**
@@ -88,5 +88,5 @@ export async function postIpRequest<T extends MessageBody, U extends MessageBody
 export async function postIpBroadcast<T extends MessageBody>(ch:number, data:T){
     const client = await openClient(ch);
 
-    await postBroadcast(client, data);
+    await sendBroadcast(client, data);
 }

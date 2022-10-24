@@ -47,7 +47,7 @@ export async function handleBroadcast<T extends MessageBody>(server:Deno.Listene
     }
 }
 
-export async function postRequest<T extends MessageBody, U extends MessageBody>(socket:Deno.Conn, data:T){
+export async function sendRequest<T extends MessageBody, U extends MessageBody>(socket:Deno.Conn, data:T){
     const promise = socketRx<U>(socket);
     await socketTx(socket, data);
     const response = await promise;
@@ -56,7 +56,7 @@ export async function postRequest<T extends MessageBody, U extends MessageBody>(
     return response;
 }
 
-export async function postBroadcast<T extends MessageBody>(socket:Deno.Conn, data:T){
+export async function sendBroadcast<T extends MessageBody>(socket:Deno.Conn, data:T){
     await socketTx(socket, data);
     socket.close();
 }
