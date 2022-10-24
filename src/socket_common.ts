@@ -1,5 +1,4 @@
 import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
-import {bitGet, bitSet, text2byte, byte2text} from "./_util.ts";
 
 export type MessageBody = JsonValue | Uint8Array;
 export type MessageHandler<T extends MessageBody, U extends MessageBody | void> = (data:T) => U | Promise<U>;
@@ -8,11 +7,27 @@ const vnU8:VarnumOptions = {
     dataType: "uint8"
 };
 
+function fSet(is:boolean, n:number){
+    return is ? (1 << n) : 0;
+}
+
+function fGet(flag:number, n:number){
+    return !!(flag & (1 << n));
+}
+
+function s2b(data:string){
+    return new TextEncoder().encode(data);
+}
+
+function b2s(data:Uint8Array){
+    return new TextDecoder().decode(data);
+}
+
 async function socketTx<T extends MessageBody>(con:Deno.Conn, data:T){
     const isByte = data instanceof Uint8Array;
 
-    const flag = bitSet(isByte, 0);
-    const body = isByte ? data : text2byte(JSON.stringify(data));
+    const flag = fSet(isByte, 0);
+    const body = isByte ? data : s2b(JSON.stringify(data));
 
     await writeVarnum(con, flag, vnU8);
     await writeAll(con, body);
@@ -23,9 +38,9 @@ async function socketRx<T extends MessageBody>(con:Deno.Conn){
     const flag = await readVarnum(con, vnU8);
     const body = await readAll(con);
 
-    const isByte = bitGet(flag, 0);
+    const isByte = fGet(flag, 0);
 
-    return isByte ? <T>body : <T>JSON.parse(byte2text(body));
+    return isByte ? <T>body : <T>JSON.parse(b2s(body));
 }
 
 export async function handleRequest<T extends MessageBody, U extends MessageBody>(server:Deno.Listener, onMessage:MessageHandler<T, U>){
