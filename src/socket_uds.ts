@@ -1,10 +1,11 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
-const tmpDirectory = Deno.build.os === "windows" ? "C:/Windows/Temp": "/tmp";
+const isWin = Deno.build.os === "windows";
+const tmpPath = isWin ? "C:/Windows/Temp" : "/tmp";
 
-// Windows is not support.
+// Not yet available for Windows.
 function excludeWindows(){
-    if(Deno.build.os === "windows"){
+    if(isWin){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }
@@ -14,7 +15,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    return `${tmpDirectory}/.deno.${ch}.socket`;
+    return `${tmpPath}/.${ch}.socket`;
 }
 
 function openServer(ch:string){
@@ -52,7 +53,8 @@ function returnServer(server:Deno.Listener){
 }
 
 /**
-* The path to the socket file will be `(tmpdir)/.deno.(ch).socket`.
+* The path to the socket file will be `(tmp)/.(ch).socket`. `(tmp)` is `/tmp` for POSIX and `C:/Windows/Temp` for Windows.
+* @summary Require the `--unstable` flag to use. Not yet available for Windows.
 * @param ch Name of the socket file. Valid character patterns are `^\w+$`.
 * @param onMessage Handler function that is called each time data is received from the remote client, Return value is the response data.
 **/
@@ -64,7 +66,8 @@ export function listenUdsRequest<T extends MessageBody, U extends MessageBody>(c
 }
 
 /**
-* The path to the socket file will be `(tmpdir)/.deno.(ch).socket`.
+* The path to the socket file will be `(tmp)/.(ch).socket`. `(tmp)` is `/tmp` for POSIX and `C:/Windows/Temp` for Windows.
+* @summary Require the `--unstable` flag to use. Not yet available for Windows.
 * @param ch Name of the socket file. Valid character patterns are `^\w+$`.
 * @param onMessage Handler function that is called each time data is received from the remote client.
 **/
@@ -76,7 +79,8 @@ export function listenUdsBroadcast<T extends MessageBody>(ch:string, onMessage:M
 }
 
 /**
-* The path to the socket file will be `(tmpdir)/.deno.(ch).socket`.
+* The path to the socket file will be `(tmp)/.(ch).socket`. `(tmp)` is `/tmp` for POSIX and `C:/Windows/Temp` for Windows.
+* @summary Require the `--unstable` flag to use. Not yet available for Windows.
 * @param ch Name of the socket file. Valid character patterns are `^\w+$`.
 * @param data Data to send to the remote host.
 * @returns Response data from remote host.
@@ -88,7 +92,8 @@ export async function postUdsRequest<T extends MessageBody, U extends MessageBod
 }
 
 /**
-* The path to the socket file will be `(tmpdir)/.deno.(ch).socket`.
+* The path to the socket file will be `(tmp)/.(ch).socket`. `(tmp)` is `/tmp` for POSIX and `C:/Windows/Temp` for Windows.
+* @summary Require the `--unstable` flag to use. Not yet available for Windows.
 * @param ch Name of the socket file. Valid character patterns are `^\w+$`.
 * @param data Data to send to the remote host.
 **/

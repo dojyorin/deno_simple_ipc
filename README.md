@@ -41,7 +41,7 @@ Unix method on the other hand, are a bit special, and cannot be used unless Deno
 
 I hope it will be "stable".
 
-Also the platform is only compatible with Linux/Mac, not Windows.
+Also the platform is only availables with Linux and Mac, not Windows.
 
 This is not Deno's problem, but because the Rust library "tokio-rs/mio" that Deno uses internally does not support "AF_UNIX" on Windows.
 
@@ -49,7 +49,7 @@ Windows itself supports "AF_UNIX" in 10 insider build 17063, and a pull request 
 
 Reference: https://github.com/tokio-rs/mio/pull/1610
 
-The path of the socket file is temporary directory `/tmp/.deno.${channel}.socket`.
+The path of the socket file is temporary directory `/tmp/.${channel_string}.socket`.
 
 Also as mentioned above temporary directory `C:/Windows/Temp` is already defined for Windows in consideration of the possibility that Windows will be supported in the future.
 
@@ -78,14 +78,14 @@ This module export the following APIs.
 - `onMessage` ... Callback when a request is received from a client. Requires response data to the client as a return value.
 
 **Notes**
-- Windows is not support.
+- Not yet available for Windows.
 
 ## `void listenUdsBroadcast(ch, onMessage)`
 - `ch` ... Communication channel string.
 - `onMessage` ... Callback when a request is received from a client.
 
 **Notes**
-- Windows is not support.
+- Not yet available for Windows.
 
 ## `postUdsRequest(ch, data)`
 - `ch` ... Communication channel string.
@@ -93,11 +93,11 @@ This module export the following APIs.
 - `return` ... Response data from server.
 
 **Notes**
-- Windows is not support.
+- Not yet available for Windows.
 
 ## `void postUdsBroadcast(ch, data)`
 - `ch` ... Communication channel string.
 - `data` ... Data to send to the server.
 
 **Notes**
-- Windows is not support.
+- Not yet available for Windows.
