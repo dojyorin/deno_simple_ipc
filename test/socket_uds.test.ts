@@ -1,12 +1,14 @@
 import {assertEquals, delay} from "../deps.test.ts";
 import {listenUdsRequest, listenUdsBroadcast, postUdsRequest, postUdsBroadcast} from "../src/socket_uds.ts";
 
+const isWin = Deno.build.os === "windows";
+
 const ch1 = "ch0";
 const ch2 = "ch1";
 
 Deno.test({
-    // Windows is not support.
-    ignore: Deno.build.os === "windows",
+    // Not yet available for Windows.
+    ignore: isWin,
     name: "UDS: Listen and Broadcast.",
     async fn(){
         const ipc = listenUdsBroadcast(ch1, (data:string)=>{
@@ -24,8 +26,8 @@ Deno.test({
 });
 
 Deno.test({
-    // Windows is not support.
-    ignore: Deno.build.os === "windows",
+    // Not yet available for Windows.
+    ignore: isWin,
     name: "UDS: Listen and Request.",
     async fn(){
         const ipc = listenUdsRequest(ch2, (data:string)=>{
