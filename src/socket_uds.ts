@@ -15,7 +15,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    return `${tmpPath}/.${ch}.socket`;
+    return `${tmpPath}/.${ch}.sock`;
 }
 
 function openServer(ch:string){
