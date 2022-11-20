@@ -1,7 +1,6 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
 const isWin = Deno.build.os === "windows";
-const tmpPath = isWin ? "C:/Windows/Temp" : "/tmp";
 
 // Not yet available for Windows.
 function excludeWindows(){
@@ -15,7 +14,9 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    return `${tmpPath}/.${ch}.sock`;
+    const tmp = isWin ? "C:/Windows/Temp" : "/tmp";
+
+    return `${tmp}/.${ch}.sock`;
 }
 
 function openServer(ch:string){
