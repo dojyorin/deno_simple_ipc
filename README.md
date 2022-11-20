@@ -49,7 +49,7 @@ Windows itself supports "AF_UNIX" in 10 insider build 17063, and a pull request 
 
 Reference: https://github.com/tokio-rs/mio/pull/1610
 
-The path of the socket file is temporary directory `/tmp/.${channel_string}.socket`.
+The path of the socket file is temporary directory `/tmp/.${channel_string}.sock`.
 
 Also as mentioned above temporary directory `C:/Windows/Temp` is already defined for Windows in consideration of the possibility that Windows will be supported in the future.
 
