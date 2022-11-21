@@ -1,10 +1,8 @@
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
-const isWin = Deno.build.os === "windows";
-
 // Not yet available for Windows.
 function excludeWindows(){
-    if(isWin){
+    if(Deno.build.os === "windows"){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }
@@ -14,7 +12,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    const tmp = isWin ? "C:/Windows/Temp" : "/tmp";
+    const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp" : "/tmp";
 
     return `${tmp}/.${ch}.sock`;
 }
