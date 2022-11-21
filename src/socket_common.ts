@@ -23,20 +23,20 @@ function byte2text(data:Uint8Array){
     return new TextDecoder().decode(data);
 }
 
-async function socketTx<T extends MessageBody>(con:Deno.Conn, data:T){
+async function socketTx<T extends MessageBody>(socket:Deno.Conn, data:T){
     const isByte = data instanceof Uint8Array;
 
     const flag = bitSet(isByte, 0);
     const body = isByte ? data : text2byte(JSON.stringify(data));
 
-    await writeVarnum(con, flag, typeU8);
-    await writeAll(con, body);
-    await con.closeWrite();
+    await writeVarnum(socket, flag, typeU8);
+    await writeAll(socket, body);
+    await socket.closeWrite();
 }
 
-async function socketRx<T extends MessageBody>(con:Deno.Conn){
-    const flag = await readVarnum(con, typeU8);
-    const body = await readAll(con);
+async function socketRx<T extends MessageBody>(socket:Deno.Conn){
+    const flag = await readVarnum(socket, typeU8);
+    const body = await readAll(socket);
 
     const isByte = bitGet(flag, 0);
 
