@@ -5,6 +5,13 @@
 The simple and lightweight module that wraps `Deno.listen()` and `Deno.connect()` for basic inter-process communication (IPC) in Deno.
 
 # Example
+This module is for Deno, it's actually socket communication, so it's compatible with processes on a variety of platforms.
+
+<p>
+<details>
+<summary>Show more details...</summary>
+<p>
+
 **Server**
 
 ```ts
@@ -21,7 +28,9 @@ const response = await postUdsRequest<string, string>("example_channel", "reques
 console.log(response); // => "response-bar"
 ```
 
-This module is for Deno, it's actually socket communication, so it's compatible with processes on a variety of platforms.
+</p>
+</details>
+</p>
 
 # Details
 With Deno's feature, you can choose between two communication methods.
