@@ -1,3 +1,4 @@
+import {tmpPath} from "./_utility.ts";
 import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
 
 // Not yet available for Windows.
@@ -12,9 +13,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    const tmp = Deno.build.os === "windows" ? "C:/Windows/Temp" : "/tmp";
-
-    return `${tmp}/.${ch}.sock`;
+    return `${tmpPath()}/.${ch}.sock`;
 }
 
 function openServer(ch:string){
