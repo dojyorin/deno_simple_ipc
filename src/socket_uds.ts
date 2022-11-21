@@ -1,9 +1,9 @@
-import {tmpPath} from "./_utility.ts";
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
+import {tmpPath, isWin} from "../deps.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./_socket.ts";
 
 // Not yet available for Windows.
 function excludeWindows(){
-    if(Deno.build.os === "windows"){
+    if(isWin()){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }

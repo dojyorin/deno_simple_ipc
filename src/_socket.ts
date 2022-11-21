@@ -1,6 +1,6 @@
-import {type JsonValue, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll} from "../deps.ts";
+import {type JsonStruct, type VarnumOptions, readVarnum, writeVarnum, readAll, writeAll, ucEncode, ucDecode} from "../deps.ts";
 
-export type MessageBody = JsonValue | Uint8Array;
+export type MessageBody = JsonStruct | Uint8Array;
 export type MessageHandler<T extends MessageBody, U extends MessageBody | void> = (data:T) => U | Promise<U>;
 
 const typeU8:VarnumOptions = {
@@ -15,19 +15,11 @@ function bitGet(flag:number, n:number){
     return !!(flag & (1 << n));
 }
 
-function text2byte(data:string){
-    return new TextEncoder().encode(data);
-}
-
-function byte2text(data:Uint8Array){
-    return new TextDecoder().decode(data);
-}
-
 async function socketTx<T extends MessageBody>(socket:Deno.Conn, data:T){
     const isByte = data instanceof Uint8Array;
 
     const flag = bitSet(isByte, 0);
-    const body = isByte ? data : text2byte(JSON.stringify(data));
+    const body = isByte ? data : ucEncode(JSON.stringify(data));
 
     await writeVarnum(socket, flag, typeU8);
     await writeAll(socket, body);
@@ -40,7 +32,7 @@ async function socketRx<T extends MessageBody>(socket:Deno.Conn){
 
     const isByte = bitGet(flag, 0);
 
-    return isByte ? <T>body : <T>JSON.parse(byte2text(body));
+    return isByte ? <T>body : <T>JSON.parse(ucDecode(body));
 }
 
 export async function handleRequest<T extends MessageBody, U extends MessageBody>(server:Deno.Listener, onMessage:MessageHandler<T, U>){
