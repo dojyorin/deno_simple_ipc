@@ -5,7 +5,7 @@ const ch1 = 0;
 const ch2 = 1;
 
 Deno.test({
-    name: "IP: Listen and Broadcast.",
+    name: "IP: Listen and Broadcast",
     async fn(){
         const ipc = listenIpBroadcast(ch1, (data:string)=>{
             assertEquals(data, "request");
@@ -22,7 +22,7 @@ Deno.test({
 });
 
 Deno.test({
-    name: "IP: Listen and Request.",
+    name: "IP: Listen and Request",
     async fn(){
         const ipc = listenIpRequest(ch2, (data:string)=>{
             assertEquals(data, "request");

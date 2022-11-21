@@ -9,7 +9,7 @@ const ch2 = "ch1";
 Deno.test({
     // Not yet available for Windows.
     ignore: isWin,
-    name: "UDS: Listen and Broadcast.",
+    name: "UDS: Listen and Broadcast",
     async fn(){
         const ipc = listenUdsBroadcast(ch1, (data:string)=>{
             assertEquals(data, "request");
@@ -28,7 +28,7 @@ Deno.test({
 Deno.test({
     // Not yet available for Windows.
     ignore: isWin,
-    name: "UDS: Listen and Request.",
+    name: "UDS: Listen and Request",
     async fn(){
         const ipc = listenUdsRequest(ch2, (data:string)=>{
             assertEquals(data, "request");
