@@ -1,10 +1,9 @@
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
-
-const isWin = Deno.build.os === "windows";
+import {tmpPath, isWin} from "../deps.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./_socket.ts";
 
 // Not yet available for Windows.
 function excludeWindows(){
-    if(isWin){
+    if(isWin()){
         throw new Error("This feature only availables POSIX compatible system.");
     }
 }
@@ -14,9 +13,7 @@ function socketPath(ch:string){
         throw new Error();
     }
 
-    const tmp = isWin ? "C:/Windows/Temp" : "/tmp";
-
-    return `${tmp}/.${ch}.sock`;
+    return `${tmpPath()}/.${ch}.sock`;
 }
 
 function openServer(ch:string){
