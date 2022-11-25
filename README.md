@@ -5,27 +5,63 @@
 The simple and lightweight module that wraps `Deno.listen()` and `Deno.connect()` for basic inter-process communication (IPC) in Deno.
 
 # Example
-This module is for Deno, it's actually socket communication, so it's compatible with processes on a variety of platforms.
+This module is for Deno, but it's really raw socket communication, so it's compatible with processes on any different platforms.
 
 <p>
 <details>
 <summary>Show more details...</summary>
 <p>
 
-**Server**
+**Server: TCP/IP**
 
 ```ts
-const ipc = listenUdsRequest("example_channel", (data:string)=>{
-    console.log(data); // => "request-foo"
-    return "response-bar";
+// Without response.
+listenIpBroadcast(0, (data:string)=>{
+    console.log(data); // => "ping"
+});
+
+// With response.
+listenIpRequest(0, (data:string)=>{
+    console.log(data); // => "ping"
+    return "pong";
 });
 ```
 
-**Client**
+**Server: UnixSocket**
 
 ```ts
-const response = await postUdsRequest<string, string>("example_channel", "request-foo");
-console.log(response); // => "response-bar"
+// Without response.
+listenUdsBroadcast("example_channel", (data:string)=>{
+    console.log(data); // => "ping"
+});
+
+// With response.
+listenUdsRequest("example_channel", (data:string)=>{
+    console.log(data); // => "ping"
+    return "pong";
+});
+```
+
+**Client: TCP/IP**
+
+```ts
+// Without response.
+await postIpBroadcast("example_channel", "ping");
+
+// With response.
+const response = await postIpRequest<string, string>(0, "ping");
+console.log(response); // => "pong"
+```
+
+**Client: UnixSocket**
+
+```ts
+// Without response.
+await postUdsBroadcast("example_channel", "ping");
+
+// With response.
+const response = await postUdsRequest<string, string>("example_channel", "ping");
+console.log(response); // => "pong"
 ```
 
 </p>
