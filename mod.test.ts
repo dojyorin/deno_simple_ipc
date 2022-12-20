@@ -1,2 +1,2 @@
-import "./test/socket_ip.test.ts";
-import "./test/socket_uds.test.ts";
+import "./test/ip.test.ts";
+import "./test/uds.test.ts";

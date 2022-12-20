@@ -1,5 +1,5 @@
 import {tmpPath, isWin} from "../deps.ts";
-import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket_common.ts";
+import {type MessageBody, type MessageHandler, handleRequest, handleBroadcast, sendRequest, sendBroadcast} from "./socket.ts";
 
 // Not yet available for Windows.
 function excludeWindows(){
