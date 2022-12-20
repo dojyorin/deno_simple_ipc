@@ -1,2 +1,2 @@
-export * from "./src/socket_ip.ts";
-export * from "./src/socket_uds.ts";
+export * from "./src/ip.ts";
+export * from "./src/uds.ts";
