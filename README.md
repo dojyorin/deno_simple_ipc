@@ -16,12 +16,12 @@ This module is for Deno, but it's really raw socket communication, so it's compa
 
 ```ts
 // Without response.
-listenIpBroadcast(0, (data:string)=>{
+listenIpBroadcast(49152, (data:string)=>{
     console.log(data); // => "ping"
 });
 
 // With response.
-listenIpRequest(0, (data:string)=>{
+listenIpRequest(49152, (data:string)=>{
     console.log(data); // => "ping"
     return "pong";
 });
@@ -31,12 +31,12 @@ listenIpRequest(0, (data:string)=>{
 
 ```ts
 // Without response.
-listenUdsBroadcast("example_channel", (data:string)=>{
+listenUdsBroadcast("ch0", (data:string)=>{
     console.log(data); // => "ping"
 });
 
 // With response.
-listenUdsRequest("example_channel", (data:string)=>{
+listenUdsRequest("ch0", (data:string)=>{
     console.log(data); // => "ping"
     return "pong";
 });
@@ -46,10 +46,10 @@ listenUdsRequest("example_channel", (data:string)=>{
 
 ```ts
 // Without response.
-await postIpBroadcast("example_channel", "ping");
+await postIpBroadcast(49152, "ping");
 
 // With response.
-const response = await postIpRequest<string, string>(0, "ping");
+const response = await postIpRequest<string, string>(49152, "ping");
 console.log(response); // => "pong"
 ```
 
@@ -57,10 +57,10 @@ console.log(response); // => "pong"
 
 ```ts
 // Without response.
-await postUdsBroadcast("example_channel", "ping");
+await postUdsBroadcast("ch0", "ping");
 
 // With response.
-const response = await postUdsRequest<string, string>("example_channel", "ping");
+const response = await postUdsRequest<string, string>("ch0", "ping");
 console.log(response); // => "pong"
 ```
 
@@ -82,9 +82,7 @@ Unlike Unix Socket, which is described later, this is a better option because it
 However UnixSocket is often faster in terms of performance.
 
 ## Unix Socket
-Unix method on the other hand, are a bit special, and cannot be used unless Deno's `--unstable` flag is enabled.
-
-I hope it will be "stable".
+Unix methods, can be used by enable Deno's `--unstable` flag.
 
 Also the platform is only availables with Linux and Mac, not Windows.
 
@@ -94,7 +92,7 @@ Windows itself supports "AF_UNIX" in 10 insider build 17063, and a pull request 
 
 Reference: https://github.com/tokio-rs/mio/pull/1610
 
-The path of the socket file is temporary directory `/tmp/.${channel_string}.sock`.
+The path of the socket file is temporary directory `/tmp/{name}.sock`.
 
 Also as mentioned above temporary directory `C:/Windows/Temp` is already defined for Windows in consideration of the possibility that Windows will be supported in the future.
 
